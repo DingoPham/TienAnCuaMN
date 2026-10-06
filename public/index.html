@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý tiền ăn</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">TEAM FOOD</p>
+        <h1>Quản lý tiền ăn</h1>
+        <p class="subtitle">Nhập dữ liệu một lần, hệ thống tự đẩy về Google Sheets.</p>
+      </div>
+      <div class="status-dot"><span></span> Online</div>
+    </header>
+
+    <form id="foodForm">
+      <section class="card">
+        <div class="section-title">
+          <div class="number">1</div>
+          <div>
+            <h2>Thông tin kỳ</h2>
+            <p>Chọn khoảng ngày cần ghi nhận.</p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <label>
+            <span>Từ ngày</span>
+            <input type="date" id="fromDate" required>
+          </label>
+          <label>
+            <span>Đến ngày</span>
+            <input type="date" id="toDate" required>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <div class="number">2</div>
+          <div>
+            <h2>Những người đóng tiền theo tuần</h2>
+            <p>Có thể thêm bao nhiêu người tùy ý.</p>
+          </div>
+        </div>
+
+        <div id="weeklyPayers" class="repeat-list"></div>
+        <button type="button" class="btn secondary" id="addPayer">+ Thêm người</button>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <div class="number">3</div>
+          <div>
+            <h2>Những người ăn trong ngày</h2>
+            <p>Mỗi ngày tạo một nhóm người ăn. Có thể đánh dấu đã trả hoặc dùng khoản dư.</p>
+          </div>
+        </div>
+
+        <div id="dailyMeals" class="repeat-list"></div>
+        <button type="button" class="btn secondary" id="addDay">+ Thêm ngày</button>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <div class="number">4</div>
+          <div>
+            <h2>Khoản dư đóng tuần trước</h2>
+            <p>Ví dụ: Chị Ngát: dư 1 suất (02 tháng 10).</p>
+          </div>
+        </div>
+
+        <div id="carryovers" class="repeat-list"></div>
+        <button type="button" class="btn secondary" id="addCarryover">+ Thêm khoản dư</button>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <div class="number">5</div>
+          <div>
+            <h2>Tổng những khoản của sếp đã ăn</h2>
+            <p>Nhập các ngày sếp đã ăn, ví dụ: 01/10, 05/10, 06/10.</p>
+          </div>
+        </div>
+
+        <label>
+          <span>Các ngày</span>
+          <input type="text" id="bossDates" placeholder="01/10, 05/10, 06/10">
+        </label>
+      </section>
+
+      <section class="preview card">
+        <div class="section-title">
+          <div class="number">✓</div>
+          <div>
+            <h2>Xem trước</h2>
+            <p>Dữ liệu sẽ được lưu thành một dòng theo đúng 6 cột của bảng.</p>
+          </div>
+        </div>
+        <div id="preview" class="preview-grid"></div>
+      </section>
+
+      <div class="submit-bar">
+        <button class="btn primary" type="submit" id="submitBtn">Lưu vào Google Sheets</button>
+        <div id="message" class="message" role="status"></div>
+      </div>
+    </form>
+  </main>
+
+  <template id="payerTemplate">
+    <div class="repeat-row payer-row">
+      <input class="payer-name" type="text" placeholder="Tên người" required>
+      <input class="payer-amount" type="number" min="0" step="1000" placeholder="Số tiền" required>
+      <select class="payer-paid">
+        <option value="Đã trả">Đã trả</option>
+        <option value="Chưa trả">Chưa trả</option>
+      </select>
+      <button type="button" class="icon-btn remove" aria-label="Xóa">×</button>
+    </div>
+  </template>
+
+  <template id="dayTemplate">
+    <div class="day-block">
+      <div class="day-head">
+        <label>
+          <span>Ngày</span>
+          <input class="meal-date" type="date" required>
+        </label>
+        <button type="button" class="icon-btn remove remove-day" aria-label="Xóa ngày">×</button>
+      </div>
+      <div class="people-list"></div>
+      <button type="button" class="btn tiny add-person">+ Thêm người ăn</button>
+    </div>
+  </template>
+
+  <template id="personTemplate">
+    <div class="repeat-row person-row">
+      <input class="person-name" type="text" placeholder="Tên người ăn" required>
+      <input class="person-amount" type="number" min="0" step="1000" placeholder="Số tiền" required>
+      <select class="person-status">
+        <option value="Đã trả">Đã trả</option>
+        <option value="Chưa trả">Chưa trả</option>
+        <option value="Sử dụng khoản dư">Sử dụng khoản dư</option>
+      </select>
+      <button type="button" class="icon-btn remove" aria-label="Xóa">×</button>
+    </div>
+  </template>
+
+  <template id="carryoverTemplate">
+    <div class="repeat-row carryover-row">
+      <input class="carry-name" type="text" placeholder="Tên người" required>
+      <input class="carry-detail" type="text" placeholder="Ví dụ: Dư 1 suất (02 tháng 10)" required>
+      <button type="button" class="icon-btn remove" aria-label="Xóa">×</button>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

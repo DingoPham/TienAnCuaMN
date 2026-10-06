@@ -1,0 +1,13 @@
+{
+  "name": "quan-ly-tien-an",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Form quan ly tien an, Render frontend + API proxy + Google Apps Script",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
